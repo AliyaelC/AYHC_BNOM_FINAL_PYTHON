@@ -1,0 +1,398 @@
+import pygame
+import sys
+import random
+from pygame.locals import *
+
+pygame.init()
+screen = pygame.display.set_mode((896,768 ))
+pygame.display.set_caption("CyberCook!")
+main_font = pygame.font.SysFont("cambria", 50)
+fondo = pygame.image.load("menu_null.png")
+
+#Personaje
+imagen1 = pygame.image.load("guy3.png")
+(x,y) = (100,100)
+vx = 0
+vy = 0
+
+#posicion del personaje
+personaje = pygame.sprite.Sprite()
+personaje.image = imagen1
+personaje.rect = imagen1.get_rect()
+personaje.rect.top = 270
+personaje.rect.left = 50
+
+#Fps
+reloj = pygame.time.Clock()
+FPS = 60
+
+#Clase de botones que va en el menu inicial
+class Button():
+
+     def __init__(self, image, x_pos, y_pos, text_input):
+         self.image = image
+         self.x_pos = x_pos
+         self.y_pos = y_pos
+         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
+         self.text_input = text_input
+         self.text = main_font.render(self.text_input, True, "white")
+         self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
+
+     def update(self):
+        screen.blit(self.image, self.rect)
+        screen.blit(self.text, self.text_rect)
+
+     def checkForInput(self, position):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+            return True
+        return False
+
+
+#Botones que van en el Menu Inicial
+#boton1
+button_surface = pygame.image.load("start.png")
+button_surface = pygame.transform.scale(button_surface, (416, 175))
+buttonstart = Button(button_surface, 613, 437, " ")
+
+
+#boton 2
+button_surface = pygame.image.load("exit.png")
+button_surface = pygame.transform.scale(button_surface, (416, 175))
+buttonexit = Button(button_surface, 613, 620, " ")
+
+#boton3
+button_surface = pygame.image.load("instrucciones.png")
+button_surface = pygame.transform.scale(button_surface, (172, 62))
+buttoninstrucciones = Button(button_surface, 100, 700, " ")
+
+#boton4
+button_surface = pygame.image.load("instrucciones.png")
+button_surface = pygame.transform.scale(button_surface, (172, 62))
+buttonregresar = Button(button_surface, 100, 700, " ")
+
+
+
+#Funcion de Jugar
+
+def jugar():
+
+    WHITE = (250,250,250)
+    BLACK = (0,0,0)
+    pygame.init()
+
+    pygame.mixer.music.load("musica.wav")
+    pygame.mixer.music.play(3)
+
+    pantalla = pygame.display.set_mode((896,768 ))
+    fondo = pygame.image.load("FONDO_JUEGO.png")
+    imagen1 = pygame.image.load("guy3.png")
+    personaje = pygame.sprite.Sprite()
+    personaje.image = imagen1
+    personaje.rect = imagen1.get_rect()
+    personaje.rect.top = 650
+    personaje.rect.left = 350
+
+    #(x,y) = (100,100)
+    vx = 0
+    vy = 0
+
+    imagen2 = pygame.image.load("chefm0.png")
+    personaje2 = pygame.sprite.Sprite()
+    personaje2.image = imagen2
+    personaje2.rect = imagen2.get_rect()
+    personaje2.rect.top = 350 #650
+    personaje2.rect.left = 520  #500
+    receta = pygame.image.load("recipe.png")
+    receta = pygame.transform.scale(receta,(646,318))
+
+
+    Rows = 2
+    Cols = 13
+    Gap = 10
+    Size = 50
+    Boxes = []
+
+    for row in range(Rows):
+        for col in range(Cols):
+            x = (((col * Gap) + Gap) + (Size * col)) + 5
+            y = (((row * Gap) + Gap) + (Size * row)) + 410
+            box = pygame.Rect(x,y,Size, Size)
+            Boxes.append(box)
+
+
+    BtnLetter = []
+    A = 65
+
+    for ind, box in enumerate(Boxes):
+        letter = chr(A+ind)
+        button = [box,letter]
+        BtnLetter.append(button)
+
+
+    WORD = "HARINA"
+    GUESSED = []
+    WORD1 = "HUEVOS"
+    GUESSED1 = []
+    WORD2 = "VAINILLA"
+    GUESSED2 = []
+    WORD3 = "LECHE"
+    GUESSED3 = []
+
+
+
+    while True:
+
+        GameOver = False
+        Mouse_pos = pygame.mouse.get_pos()
+
+        pantalla.blit(fondo,(0,0))
+        pantalla.blit(receta,(0,0))
+
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+
+            if event.type == pygame.KEYDOWN:
+
+                if event.key == pygame.K_LEFT:
+                        vx -= 10
+                if event.key == pygame.K_RIGHT:
+                        vx += 10
+                if event.key == pygame.K_UP:
+                        vy -= 10
+                if event.key == pygame.K_DOWN:
+                        vy += 10
+
+                pygame.display.update()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                click_pos = event.pos
+
+                for button, letter in BtnLetter:
+
+                    if button.collidepoint(click_pos):
+                        print(letter)
+                        GUESSED.append(letter)
+                        GUESSED1.append(letter)
+                        GUESSED2.append(letter)
+                        GUESSED3.append(letter)
+                        BtnLetter.remove([button,letter])
+
+        for box in Boxes:
+            pygame.draw.rect(screen, WHITE, box, 100)
+
+
+        for box, letter in BtnLetter:
+
+            btnText = main_font.render(letter,True,BLACK)
+            btn_rect = btnText.get_rect(center=(box.x + 25, box.y + 22))
+            screen.blit(btnText, btn_rect)
+            pygame.draw.rect(screen, BLACK, box, 2)
+
+        display_text = " "
+        display_text1 = " "
+        display_text2 = " "
+        display_text3 = " "
+
+
+
+        for letter in WORD :
+            if letter in GUESSED:
+                display_text += f"{letter}"
+            else:
+                display_text += "_ "
+
+        for letter in WORD1 :
+            if letter in GUESSED1:
+                display_text1 += f"{letter}"
+            else:
+                display_text1 += "_ "
+        for letter in WORD2 :
+            if letter in GUESSED2:
+                display_text2 += f"{letter}"
+            else:
+                display_text2 += "_ "
+
+        for letter in WORD3 :
+            if letter in GUESSED3:
+                display_text3 += f"{letter}"
+            else:
+                display_text3 += "_ "
+
+
+        text = main_font.render(display_text, True, BLACK)
+        text1 = main_font.render(display_text1, True, BLACK)
+        text2 = main_font.render(display_text2, True, BLACK)
+        text3 = main_font.render(display_text3, True, BLACK)
+        pantalla.blit(text, (255, 90)) #350,323
+        pantalla.blit(text1, (255, 140)) #350,323
+        pantalla.blit(text2, (255, 190)) #350,323
+        pantalla.blit(text3, (255, 240)) #350,323
+
+        pygame.display.update()
+
+        won = True
+
+        for letter in WORD :
+            if letter not in GUESSED:
+                won = False
+        for letter in WORD1:
+            if letter not in GUESSED1:
+                won = False
+        for letter in WORD2:
+            if letter not in GUESSED2:
+                won = False
+        for letter in WORD3:
+            if letter not in GUESSED3:
+                won = False
+        if won:
+            GameOver = True
+            GameOver_msg = "You Won"
+        else:
+            GameOver_msg = "You Lost"
+        if GameOver:
+            final()
+
+        screen.blit(personaje.image, personaje.rect)
+        screen.blit(personaje2.image, personaje2.rect)
+
+        personaje.rect.move_ip((vx,vy))
+        #reloj.tick(FPS)
+        pygame.display.update()
+
+
+
+#Funciones de instrucciones y regresar
+def final():
+    pygame.init()
+    screen = pygame.display.set_mode((896,768 ))
+    pygame.display.set_caption("CyberCook!")
+
+    main_font = pygame.font.SysFont("cambria", 50)
+    fondo = pygame.image.load("final.png")
+
+    class Button():
+
+     def __init__(self, image, x_pos, y_pos, text_input):
+         self.image = image
+         self.x_pos = x_pos
+         self.y_pos = y_pos
+         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
+         self.text_input = text_input
+         self.text = main_font.render(self.text_input, True, "white")
+         self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
+
+     def update(self):
+        screen.blit(self.image, self.rect)
+        screen.blit(self.text, self.text_rect)
+
+     def checkForInput(self, position):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+            return True
+        return False
+
+    #boton4
+    button_surface = pygame.image.load("regresar.png")
+    button_surface = pygame.transform.scale(button_surface, (172, 62))
+    buttonregresar = Button(button_surface, 100, 680, " ")
+
+    while True:
+        screen.blit(fondo,(0,0))
+        Mouse_pos = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if buttonregresar.checkForInput(Mouse_pos):
+                    menu()
+        buttonregresar.update()
+        pygame.display.update()
+
+def instrucciones():
+
+    pygame.init()
+    screen = pygame.display.set_mode((896,768 ))
+    pygame.display.set_caption("CyberCook  !")
+
+    main_font = pygame.font.SysFont("cambria", 50)
+    fondo = pygame.image.load("instrucciones4.png")
+
+    class Button():
+
+     def __init__(self, image, x_pos, y_pos, text_input):
+         self.image = image
+         self.x_pos = x_pos
+         self.y_pos = y_pos
+         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
+         self.text_input = text_input
+         self.text = main_font.render(self.text_input, True, "white")
+         self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
+
+     def update(self):
+        screen.blit(self.image, self.rect)
+        screen.blit(self.text, self.text_rect)
+
+     def checkForInput(self, position):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+            return True
+        return False
+
+    #boton4
+    button_surface = pygame.image.load("regresar.png")
+    button_surface = pygame.transform.scale(button_surface, (172, 62))
+    buttonregresar = Button(button_surface, 100, 680, " ")
+
+    while True:
+        screen.blit(fondo,(0,0))
+        Mouse_pos = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if buttonregresar.checkForInput(Mouse_pos):
+                    menu()
+        buttonregresar.update()
+        pygame.display.update()
+
+    #archivo = open("instrucciones.txt")
+    #print(archivo.read())
+    #archivo.close()
+
+
+
+
+#Menu Inicial
+def menu():
+    while True:
+        screen.blit(fondo,(0,0))
+        Mouse_pos = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+
+                if buttonstart.checkForInput(Mouse_pos):
+                     jugar()
+
+                if buttonexit.checkForInput(Mouse_pos):
+                     pygame.quit()
+                     sys.exit()
+
+                if buttoninstrucciones.checkForInput(Mouse_pos):
+                     instrucciones()
+
+        buttonstart.update()
+        buttonexit.update()
+        buttoninstrucciones.update()
+        pygame.display.update()
+
+
+menu()
